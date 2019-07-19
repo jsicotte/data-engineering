@@ -1,0 +1,39 @@
+version: "3.7"
+
+services:
+  node-master:
+    image: hadooptest:latest
+    command: ["/custom-start.sh"]
+    hostname: node-master
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+    ports:
+      - 50070:50070
+  node1:
+    image: hadooptest:latest
+    command: ["/hadoop-2.7.6/bin/hdfs", "datanode"]
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+  node2:
+    image: hadooptest:latest
+    command: ["/hadoop-2.7.6/bin/hdfs", "datanode"]
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+  yarn-resource-manager:
+    hostname: yarn-resource-manager
+    image: hadooptest:latest
+    command: ["/hadoop-2.7.6/bin/yarn", "org.apache.hadoop.yarn.server.resourcemanager.ResourceManager"]
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+    ports:
+      - 8088:8088
+  yarn-node-manager-1:
+    image: hadooptest:latest
+    command: ["/hadoop-2.7.6/bin/yarn", "org.apache.hadoop.yarn.server.nodemanager.NodeManager"]
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+  yarn-node-manager-2:
+    image: hadooptest:latest
+    command: ["/hadoop-2.7.6/bin/yarn", "org.apache.hadoop.yarn.server.nodemanager.NodeManager"]
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
