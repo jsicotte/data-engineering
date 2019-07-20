@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+    jupyter:
+        image: jupyter/all-spark-notebook
+        ports:
+        - 8888:8888
+        volumes:
+        - .:/home/jovyan/work
+    nteract:
+        build:
+            context: nteract
+        ports:
+        - 8889:8888
+        volumes:
+        - .:/home/jovyan/work
+        command: ["jupyter", "nteract"]
+    commuter:
+        build:
+            context: ./Commuter
+        ports:
+        - 4000:4000
+        command: ["exec", "commuter"]
+        volumes:
+        - .:/home/jovyan/work
+        environment:
+        - COMMUTER_LOCAL_STORAGE_BASEDIRECTORY=/home/jovyan/work
