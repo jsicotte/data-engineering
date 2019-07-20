@@ -17,7 +17,7 @@ services:
         command: ["jupyter", "nteract"]
     commuter:
         build:
-            context: ./Commuter
+            context: ./commuter
         ports:
         - 4000:4000
         command: ["exec", "commuter"]
