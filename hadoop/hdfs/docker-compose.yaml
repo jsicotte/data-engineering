@@ -9,31 +9,52 @@ services:
       - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
     ports:
       - 50070:50070
+    networks: 
+      - proxynet
+    volumes:
+      - hadoop:/hadoop-2.7.6
   node1:
     image: hadooptest:latest
     command: ["/hadoop-2.7.6/bin/hdfs", "datanode"]
     environment:
       - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+    networks: 
+      - proxynet
   node2:
     image: hadooptest:latest
     command: ["/hadoop-2.7.6/bin/hdfs", "datanode"]
     environment:
       - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+    networks: 
+      - proxynet
   yarn-resource-manager:
     hostname: yarn-resource-manager
     image: hadooptest:latest
     command: ["/hadoop-2.7.6/bin/yarn", "org.apache.hadoop.yarn.server.resourcemanager.ResourceManager"]
     environment:
       - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+      - PYSPARK_PYTHON=/usr/local/bin/python3.7
     ports:
       - 8088:8088
+    networks: 
+      - proxynet
   yarn-node-manager-1:
     image: hadooptest:latest
     command: ["/hadoop-2.7.6/bin/yarn", "org.apache.hadoop.yarn.server.nodemanager.NodeManager"]
     environment:
       - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+    networks: 
+      - proxynet
   yarn-node-manager-2:
     image: hadooptest:latest
     command: ["/hadoop-2.7.6/bin/yarn", "org.apache.hadoop.yarn.server.nodemanager.NodeManager"]
     environment:
       - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+    networks: 
+      - proxynet
+      
+networks:
+  proxynet:
+    name: custom_network
+volumes:
+  hadoop:
