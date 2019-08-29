@@ -1,6 +1,23 @@
 version: '3'
 
 services:
+    jupyter-hadoop:
+        build:
+            context: jupyter
+        ports:
+        - 8888:8888
+        environment:
+        - HADOOP_HOME=/home/jovyan/work
+        volumes:
+        #- hdfs_hadoop:/hadoop-2.7.6
+        - spark_spark:/spark-2.4.0-bin-hadoop2.7
+        environment:
+        - HADOOP_HOME=/hadoop-2.7.6
+        - SPARK_HOME=/spark-2.4.0-bin-hadoop2.7
+        - HADOOP_CONF_DIR=/hadoop-2.7.6/etc/hadoop
+        - YARN_CONF_DIR=/hadoop-2.7.6/etc/hadoop
+        networks:
+        - my-proxy-net
     jupyter:
         image: jupyter/all-spark-notebook
         ports:
@@ -25,3 +42,13 @@ services:
         - .:/home/jovyan/work
         environment:
         - COMMUTER_LOCAL_STORAGE_BASEDIRECTORY=/home/jovyan/work
+volumes:
+    hdfs_hadoop:
+        external: true
+    spark_spark:
+        external: true
+
+networks:
+  my-proxy-net:
+    external:
+      name: custom_network

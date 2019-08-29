@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+    example-submit:
+      build:
+          context: .
+      command: ["spark-submit", "hello_world.py"]
+      networks:
+      - my-proxy-net
+      volumes:
+      - hdfs_hadoop:/hadoop-2.7.6
+      - spark_spark:/spark-2.4.0-bin-hadoop2.7
+      environment:
+      - SPARK_HOME=/spark-2.4.0-bin-hadoop2.7
+      - HADOOP_CONF_DIR=/hadoop-2.7.6/etc/hadoop
+      - PYSPARK_DRIVER_PYTHON=/usr/local/bin/python3.7
+      - PYSPARK_PYTHON=/usr/local/bin/python3.7
+
+networks:
+  my-proxy-net:
+    external:
+      name: custom_network
+volumes:
+    hdfs_hadoop:
+        external: true
+    spark_spark:
+        external: true

@@ -1,0 +1,18 @@
+{
+  "argv": [
+   "python",
+   "-m",
+   "ipykernel_launcher",
+   "-f",
+   "{connection_file}"
+  ],
+  "display_name": "Python 3",
+  "language": "python",
+  "env": {
+    "SPARK_HOME": "/spark-2.4.0-bin-hadoop2.7/",
+    "PYTHONPATH": "/spark-2.4.0-bin-hadoop2.7/python/:/spark-2.4.0-bin-hadoop2.7/python/lib/py4j-0.10.7-src.zip",
+    "PYSPARK_DRIVER_PYTHON": "jupyter",
+    "PYSPARK_DRIVER_PYTHON_OPTS": "notebook",
+    "PYSPARK_PYTHON": "/usr/local/bin/python3.7"
+  }
+ }

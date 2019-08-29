@@ -46,5 +46,9 @@
             <name>yarn.nodemanager.vmem-check-enabled</name>
             <value>false</value>
     </property>
+    <property>
+        <name>yarn.scheduler.maximum-allocation-vcores</name>
+        <value>1</value>
+    </property>
 </configuration>
 
