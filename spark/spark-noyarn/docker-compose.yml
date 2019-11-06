@@ -1,0 +1,109 @@
+version: "3.7"
+services:
+  spark-master:
+    build:
+      context: .
+    image: spark
+    ports:
+    - "8080:8080"
+    - "7077:7077"
+    environment:
+    - SPARK_HOME=/spark-2.4.4-bin-hadoop2.7
+    - CLASS=org.apache.spark.deploy.master.Master
+    - SPARK_CONF_DIR=/spark-2.4.4-bin-hadoop2.7/conf
+    - PYTHONPATH="/spark-2.4.4-bin-hadoop2.7/python/lib/py4j-0.10.7-src.zip:/spark-2.4.4-bin-hadoop2.7/python:"
+    - PYSPARK_PYTHONPATH_SET=1
+    - SPARK_SCALA_VERSION=2.12
+    - SPARK_MASTER_PORT=7077
+    - SPARK_MASTER_HOST=spark-master
+    - SPARK_MASTER_WEBUI_PORT=8080
+    command: java -cp "/spark-2.4.4-bin-hadoop2.7/conf/:/spark-2.4.4-bin-hadoop2.7/jars/*" org.apache.spark.deploy.master.Master -h spark-master
+    hostname: spark-master
+    volumes:
+      - applications4:/applications
+      - spark-logs:/tmp/spark-events
+    deploy:
+        resources:
+          limits:
+            cpus: '1'
+            memory: 1G
+          reservations:
+            cpus: '1'
+            memory: 1G
+    
+  spark-worker-1:
+    build:
+      context: .
+    image: spark
+    command: java -cp "/spark-2.4.4-bin-hadoop2.7/conf/:/spark-2.4.4-bin-hadoop2.7/jars/*" org.apache.spark.deploy.worker.Worker spark-master:7077
+    environment:
+    - SPARK_HOME=/spark-2.4.4-bin-hadoop2.7
+    - SPARK_CONF_DIR=/spark-2.4.4-bin-hadoop2.7/conf/
+    - SPARK_EXECUTOR_MEMORY=2g
+    - SPARK_WORKER_MEMORY=2g
+    - SPARK_SCALA_VERSION=2.11
+    - SPARK_WORKER_CORES=2
+    - SPARK_LOCAL_IP=172.21.0.3
+    ports:
+    - "8081:8081"
+    hostname: worker1
+    volumes:
+      - applications4:/applications
+      - spark-logs:/tmp/spark-events
+    deploy:
+        resources:
+          limits:
+            cpus: '1'
+            memory: 2G
+          reservations:
+            cpus: '1'
+            memory: 2G
+            
+  spark-history-server:
+    build:
+      context: .
+    image: spark
+    command: java -cp "/spark-2.4.4-bin-hadoop2.7/conf/:/spark-2.4.4-bin-hadoop2.7/jars/*" org.apache.spark.deploy.history.HistoryServer
+    environment:
+    - SPARK_HOME=/spark-2.4.4-bin-hadoop2.7
+    - SPARK_CONF_DIR=/spark-2.4.4-bin-hadoop2.7/conf/
+    - SPARK_EXECUTOR_MEMORY=2g
+    - SPARK_WORKER_MEMORY=2g
+    - SPARK_SCALA_VERSION=2.11
+    - SPARK_WORKER_CORES=2
+    ports:
+    - "18080:18080"
+    hostname: worker1
+    volumes:
+      - applications4:/applications
+      - spark-logs:/tmp/spark-events
+    deploy:
+        resources:
+          limits:
+            cpus: '1'
+            memory: 1G
+          reservations:
+            cpus: '1'
+            memory: 1G
+   
+  spark-example:
+    build:
+      context: .
+    image: spark
+    command: /spark-2.4.4-bin-hadoop2.7/bin/spark-submit --deploy-mode cluster --driver-cores 1  --executor-memory 600m --master spark://spark-master:7077 --class spark.chapter3.SparkDagExample /applications/spark-1.0-SNAPSHOT-all.jar
+    environment:
+    - SPARK_HOME=/spark-2.4.4-bin-hadoop2.7
+    - SPARK_CONF_DIR=/spark-2.4.4-bin-hadoop2.7/conf/
+
+    volumes:
+      - applications4:/applications
+      - spark-logs:/tmp/spark-events
+
+volumes:
+  spark-logs:
+  applications4:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/jsicotte/Documents/workspaces/data-engineering/spark/applications
