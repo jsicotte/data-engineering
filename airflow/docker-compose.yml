@@ -1,0 +1,53 @@
+version: "3.7"
+services:
+    redis:
+        image: redis:5.0.5
+        networks: 
+            - airflow
+    webserver:
+        build: ./
+        ports:
+            - 8080:8080
+        environment:
+            - AIRFLOW_HOME=/root/airflow
+            - FERNET_KEY=I1BrhPSRskFL6xVst4JYD3pB2rlSrPtq6MWeTgePHz4=
+        #command: '/bin/sh -c "echo $$AIRFLOW_HOME"'
+        #command: airflow list_dags
+        command: airflow webserver
+        networks: 
+            - airflow
+        volumes:
+            - ./dags:/root/airflow/dags
+    celery-scheduler:
+        build: ./Broker/
+        environment:
+            - AIRFLOW_HOME=/root/airflow
+            - FERNET_KEY=I1BrhPSRskFL6xVst4JYD3pB2rlSrPtq6MWeTgePHz4=
+            - C_FORCE_ROOT=true
+        command: airflow scheduler
+        networks: 
+            - airflow
+        volumes:
+            - ./dags:/root/airflow/dags
+    start-worker:
+        build: ./Broker/
+        environment:
+            - AIRFLOW_HOME=/root/airflow
+            - FERNET_KEY=I1BrhPSRskFL6xVst4JYD3pB2rlSrPtq6MWeTgePHz4=
+        command: airflow scheduler
+        networks: 
+            - airflow
+        volumes:
+            - ./dags:/root/airflow/dags
+    mysql:
+        image: mysql:8.0.19
+        environment:
+            - MYSQL_USER=airflow
+            - MYSQL_PASSWORD=airflow
+            - MYSQL_ROOT_PASSWORD=airflow
+        networks: 
+            - airflow
+        ports:
+            - 3306:3306
+networks: 
+    airflow:
