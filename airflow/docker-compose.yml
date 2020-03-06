@@ -34,7 +34,8 @@ services:
         environment:
             - AIRFLOW_HOME=/root/airflow
             - FERNET_KEY=I1BrhPSRskFL6xVst4JYD3pB2rlSrPtq6MWeTgePHz4=
-        command: airflow scheduler
+            - C_FORCE_ROOT=true
+        command: airflow worker
         networks: 
             - airflow
         volumes:
@@ -45,6 +46,7 @@ services:
             - MYSQL_USER=airflow
             - MYSQL_PASSWORD=airflow
             - MYSQL_ROOT_PASSWORD=airflow
+            - MYSQL_DATABASE=airflow
         networks: 
             - airflow
         ports:
