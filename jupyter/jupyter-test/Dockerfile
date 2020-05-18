@@ -19,6 +19,9 @@ RUN cd cd Python-3.7.0; \
 RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
 RUN python get-pip.py
 RUN python3.7 get-pip.py
-#RUN pip3 install pyspark
 RUN pip3 install --upgrade pip
 RUN pip3 install jupyter
+# a new version up setuptools is required for tensorboard
+RUN pip3 install setuptools --upgrade
+# to run tensorboard execute: tensorboard --logdir=logs/ --host 0.0.0.0 --port 8889 after running: %load_ext tensorboard
+RUN pip3 install tensorflow
