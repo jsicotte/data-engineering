@@ -4,6 +4,28 @@ services:
     mlflow-ui:
       build:
           context: .
-      command: ["mlflow", "server", "--host", "0.0.0.0"]
+      command: ["mlflow", "server", "--host", "0.0.0.0", "--default-artifact-root", "s3://my-mlflow-bucket/", "--backend-store-uri", "mysql+pymysql://mlflow:mlflow@mysql/mlflow"]
+      environment:
+        - MLFLOW_S3_ENDPOINT_URL=http://minio:9000/
+        - AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+        - AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
       ports:
         - 5000:5000
+    minio:
+        hostname: minio
+        image: minio/minio
+        ports:
+            - 9000:9000
+        environment:
+            - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+            - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        command: server /data
+    mysql:
+      image: mysql:8.0.19
+      environment:
+          - MYSQL_USER=mlflow
+          - MYSQL_PASSWORD=mlflow
+          - MYSQL_ROOT_PASSWORD=mlflow
+          - MYSQL_DATABASE=mlflow
+      ports:
+          - 3306:3306
