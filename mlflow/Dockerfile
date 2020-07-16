@@ -8,3 +8,4 @@ RUN apt-get update
 RUN apt-get install python-mysqldb
 RUN pip3 install mysqlclient
 RUN pip3 install pymysql
+RUN pip3 install PyMySQL[rsa]
