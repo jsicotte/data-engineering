@@ -5,14 +5,12 @@ services:
         networks: 
             - airflow
     webserver:
-        build: ./
+        build: ./Broker/
         ports:
             - 8080:8080
         environment:
             - AIRFLOW_HOME=/root/airflow
             - FERNET_KEY=I1BrhPSRskFL6xVst4JYD3pB2rlSrPtq6MWeTgePHz4=
-        #command: '/bin/sh -c "echo $$AIRFLOW_HOME"'
-        #command: airflow list_dags
         command: airflow webserver
         networks: 
             - airflow
