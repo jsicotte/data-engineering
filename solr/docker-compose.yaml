@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  solr:
+    build:
+      context: .
+    command: ["solr-8.6.3/bin/solr", "start", "-p", "8984", "-force", "-f", "-z", "zookeeper"]
+    ports:
+      - 8984:8984
+    networks: 
+      - my-proxy-net
+      
+networks:
+  my-proxy-net:
+    external:
+      name: custom_network     

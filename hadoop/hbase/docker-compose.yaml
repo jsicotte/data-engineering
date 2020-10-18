@@ -1,0 +1,45 @@
+version: "3.7"
+
+services:
+  apache-atlas:
+    build:
+      context: .
+    command: ["/apache-atlas-2.1.0/bin/quick_start.py"]
+    ports:
+      - 21000:21000
+    networks: 
+      - my-proxy-net
+  hbase-regionserver:
+    build:
+        context: .
+    command: ["/hbase-2.3.1/bin/hbase", "regionserver", "start"]
+    ports:
+      - 16030:16030
+    networks: 
+      - my-proxy-net
+  hbase-regionserver-backup:
+      build:
+          context: .
+      command: ["/hbase-2.3.1/bin/hbase", "regionserver", "start"]
+      networks: 
+        - my-proxy-net
+  master:
+    build:
+        context: .
+    command: ["/hbase-2.3.1/bin/hbase", "master", "start"]
+    ports: 
+      - 16010:16010
+    networks: 
+      - my-proxy-net
+  zookeeper:
+    hostname: zookeeper
+    build:
+        context: .
+    command: ["/hbase-2.3.1/bin/hbase", "zookeeper", start"]
+    networks: 
+      - my-proxy-net        
+  
+networks:
+  my-proxy-net:
+    external:
+      name: custom_network
