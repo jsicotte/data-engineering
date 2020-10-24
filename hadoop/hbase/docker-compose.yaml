@@ -1,14 +1,14 @@
 version: "3.7"
 
 services:
-  apache-atlas:
-    build:
-      context: .
-    command: ["/apache-atlas-2.1.0/bin/quick_start.py"]
-    ports:
-      - 21000:21000
-    networks: 
-      - my-proxy-net
+  # apache-atlas:
+  #   build:
+  #     context: .
+  #   command: ["/apache-atlas-2.1.0/bin/quick_start.py"]
+  #   ports:
+  #     - 21000:21000
+  #   networks: 
+  #     - my-proxy-net
   hbase-regionserver:
     build:
         context: .

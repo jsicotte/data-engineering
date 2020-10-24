@@ -22,6 +22,9 @@ networks:
       name: custom_network
 
 volumes:
+  hadoop:
+
+volumes:
   applications2:
     driver: local
     driver_opts:

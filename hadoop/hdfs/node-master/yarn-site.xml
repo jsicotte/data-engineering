@@ -50,5 +50,13 @@
         <name>yarn.scheduler.maximum-allocation-vcores</name>
         <value>1</value>
     </property>
+    <property>
+        <name>yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage</name>
+        <value>99.9</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.disk-health-checker.enable</name>
+        <value>false</value>
+    </property>
 </configuration>
 

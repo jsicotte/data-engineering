@@ -5,7 +5,6 @@ services:
     build:
       context: .
     working_dir: /apache-atlas-2.1.0
-    #command: ["bin/atlas_start.py"]
     command: ["/usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/java", "-Datlas.log.dir=/apache-atlas-2.1.0/logs", "-Datlas.log.file=application.log", "-Datlas.home=/apache-atlas-2.1.0", "-Datlas.conf=/apache-atlas-2.1.0/conf", "-Xmx1024m", "-Dlog4j.configuration=atlas-log4j.xml", "-Djava.net.preferIPv4Stack=true", "-server", "-classpath", "/apache-atlas-2.1.0/conf:/apache-atlas-2.1.0/server/webapp/WEB-INF/classes:/apache-atlas-2.1.0/server/webapp/WEB-INF/lib/*:/apache-atlas-2.1.0/libext/*:/apache-atlas-2.1.0/conf/hbase", "org.apache.atlas.Atlas", "-app", "/apache-atlas-2.1.0/server/webapp"]
     environment:
       - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk.x86_64
