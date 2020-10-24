@@ -1,5 +1,0 @@
-elasticsearch>=6.0.0
-requests
-jupyter
-jsonpath-rw
-objectpath

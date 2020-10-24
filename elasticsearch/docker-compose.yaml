@@ -8,6 +8,8 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+    networks: 
+      - my-proxy-net
   kibana:
     image: docker.elastic.co/kibana/kibana:7.2.0
     ports:
@@ -35,3 +37,8 @@ services:
         - /var/run:/var/run:rw
         - /sys:/sys:ro
         - /var/lib/docker/:/var/lib/docker:ro
+
+networks:
+  my-proxy-net:
+    external:
+      name: custom_network
