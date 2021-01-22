@@ -4,3 +4,7 @@ spark/applications/helloworld
 */venv/*
 .vscode/
 .DS_Store
+.venv
+.idea
+*.tar.gz
+*.tgz

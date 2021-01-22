@@ -5,6 +5,7 @@ services:
   # before start: hdfs dfs -mkdir /spark-logs
     build:
       context: .
+    image: spark
     command: java -cp "/spark-2.4.0-bin-hadoop2.7/conf/:/spark-2.4.0-bin-hadoop2.7/jars/*" org.apache.spark.deploy.history.HistoryServer
     environment:
     - SPARK_HOME=/spark-2.4.0-bin-hadoop2.7
@@ -13,22 +14,8 @@ services:
     - "18080:18080"
     networks:
       - my-proxy-net
-    volumes:
-      - spark:/spark-2.4.0-bin-hadoop2.7
 
 networks:
   my-proxy-net:
     external:
       name: custom_network
-
-volumes:
-  hadoop:
-
-volumes:
-  applications2:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /Users/jsicotte/Documents/workspaces/spark/applications
-  spark:
