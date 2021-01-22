@@ -4,26 +4,23 @@ services:
     jupyter-hadoop:
         build:
             context: jupyter
+        command: ["jupyter", "lab", "--ip", "0.0.0.0", "--allow-root"]
         ports:
         - 8888:8888
+        - 45560:45560
         environment:
         - HADOOP_HOME=/home/jovyan/work
-        volumes:
+        # volumes:
         #- hdfs_hadoop:/hadoop-2.7.6
-        - spark_spark:/spark-2.4.0-bin-hadoop2.7
+        # - spark_spark:/spark-2.4.0-bin-hadoop2.7
         environment:
         - HADOOP_HOME=/hadoop-2.7.6
         - SPARK_HOME=/spark-2.4.0-bin-hadoop2.7
         - HADOOP_CONF_DIR=/hadoop-2.7.6/etc/hadoop
         - YARN_CONF_DIR=/hadoop-2.7.6/etc/hadoop
+        - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.275.b01-0.el7_9.x86_64/jre
         networks:
         - my-proxy-net
-    jupyter:
-        image: jupyter/all-spark-notebook
-        ports:
-        - 8888:8888
-        volumes:
-        - .:/home/jovyan/work
     nteract:
         build:
             context: nteract
@@ -42,11 +39,6 @@ services:
         - .:/home/jovyan/work
         environment:
         - COMMUTER_LOCAL_STORAGE_BASEDIRECTORY=/home/jovyan/work
-volumes:
-    hdfs_hadoop:
-        external: true
-    spark_spark:
-        external: true
 
 networks:
   my-proxy-net:

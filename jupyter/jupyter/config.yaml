@@ -1,0 +1,7 @@
+distributed:
+  dashboard:
+    # Configure the link template for the dask dashboard. This updates the
+    # dashboard links to proxy through jupyter-server-proxy
+    link: /proxy/{host}:{port}/status
+
+ 

@@ -3,3 +3,4 @@ spark/spark-2.4.0-bin-hadoop2.7
 spark/applications/helloworld
 */venv/*
 .vscode/
+.DS_Store
