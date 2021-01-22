@@ -4,10 +4,12 @@ services:
   node-master:
     build:
       context: node-master
+    image: master-image
+
     command: ["/custom-start.sh"]
     hostname: node-master
     environment:
-      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+      - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.275.b01-0.el7_9.x86_64/jre
     ports:
       - 50070:50070
     networks: 
@@ -15,52 +17,59 @@ services:
     volumes:
       - hadoop:/hadoop-2.7.6
   node1:
-    build:
-      context: node-master
+    image: master-image
     command: ["/hadoop-2.7.6/bin/hdfs", "datanode"]
     environment:
-      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+      - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.275.b01-0.el7_9.x86_64/jre
     networks: 
       - proxynet
+    depends_on: [node-master]
+    
   node2:
-    build:
-      context: node-master
+    image: master-image
     command: ["/hadoop-2.7.6/bin/hdfs", "datanode"]
     environment:
-      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+      - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.275.b01-0.el7_9.x86_64/jre
     networks: 
       - proxynet
+    depends_on: [node-master]
+
   yarn-resource-manager:
-    build:
-      context: node-master
+    image: master-image
     hostname: yarn-resource-manager
     command: ["/hadoop-2.7.6/bin/yarn", "org.apache.hadoop.yarn.server.resourcemanager.ResourceManager"]
     environment:
-      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+      - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.275.b01-0.el7_9.x86_64/jre
       - PYSPARK_DRIVER_PYTHON=/usr/local/bin/python3.7
     ports:
       - 8088:8088
     networks: 
       - proxynet
+    depends_on: [node-master]
+
   yarn-node-manager-1:
-    build:
-      context: node-master
+    image: master-image
     command: ["/hadoop-2.7.6/bin/yarn", "org.apache.hadoop.yarn.server.nodemanager.NodeManager"]
     environment:
-      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+      - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.275.b01-0.el7_9.x86_64/jre
       - PYSPARK_DRIVER_PYTHON=/usr/local/bin/python3.7
     networks: 
       - proxynet
+    ports:
+      - 45555:45555
+    depends_on: [node-master]
   yarn-node-manager-2:
-    build:
-      context: node-master
+    image: master-image
     command: ["/hadoop-2.7.6/bin/yarn", "org.apache.hadoop.yarn.server.nodemanager.NodeManager"]
     environment:
-      - JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64
+      - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.275.b01-0.el7_9.x86_64/jre
       - PYSPARK_DRIVER_PYTHON=/usr/local/bin/python3.7
     networks: 
       - proxynet
-      
+    ports:
+      - 45556:45555
+    depends_on: [node-master]
+
 networks:
   proxynet:
     name: custom_network

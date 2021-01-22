@@ -1,14 +1,8 @@
-FROM centos:6
+FROM centos:7
 
+RUN yum update -y
 RUN yum install -y gcc openssl-devel bzip2-devel libffi libffi-devel
-RUN yum install -y make
-RUN yum install -y wget
-RUN wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz
-RUN tar xzf Python-3.7.0.tgz
-RUN cd cd Python-3.7.0; \
-    Python-3.7.0/configure --enable-optimizations
-RUN cd cd Python-3.7.0; \
-    make altinstall
+RUN yum install -y python3
 RUN yum install -y which
 
 RUN yum install -y java-1.8.0-openjdk-devel 

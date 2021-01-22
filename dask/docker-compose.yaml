@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+  submit-test:
+    build:
+      context: .
+#    command: [
+#        "dask-yarn", "submit",
+#        "--environment", 'venv.tar.gz',
+#        "--worker-memory", "1GiB",
+#        "--scheduler-memory", "1GiB",
+#        "--client-memory","1GiB",
+#        "/test/DaskYarnExample.py"
+#    ]
+    command: ["/venv/bin/python","/test/DaskYarnExample.py"]
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.275.b01-0.el7_9.x86_64/jre
+    volumes:
+    - ./src/example:/test
+    networks:
+    - proxynet
+  nginx:
+    image: nginx:latest
+    ports:
+    - 45559:45559
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - proxynet
+networks:
+  proxynet:
+    external:
+      name: custom_network
