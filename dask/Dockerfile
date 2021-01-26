@@ -1,4 +1,3 @@
-#FROM centos:7
 FROM master-image:latest
 RUN yum -y groupinstall 'Development Tools'
 
