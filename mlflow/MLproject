@@ -1,0 +1,18 @@
+#if using a docker env this MUST be docker tag friendly
+# make sure to run the container connected to the proper network
+# for this example: mlflow run -A network=mlflow_default .
+name: example_project
+
+docker_env:
+  image: mlflow_mlflow-ui
+  environment: [
+    ["MLFLOW_TRACKING_URI", "http://mlflow-ui:5000/"],
+    ["AWS_ACCESS_KEY_ID","AKIAIOSFODNN7EXAMPLE"],
+    ["AWS_SECRET_ACCESS_KEY","wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"],
+    ["MLFLOW_S3_ENDPOINT_URL","http://minio:9000/"]
+  ]
+entry_points:
+  main:
+    command: "python Example.py"
+  run_example:
+    command: "python RunExample.py"

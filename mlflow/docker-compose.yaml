@@ -11,6 +11,7 @@ services:
         - AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
       ports:
         - 5000:5000
+      depends_on: ["mysql"]
     minio:
         hostname: minio
         image: minio/minio
