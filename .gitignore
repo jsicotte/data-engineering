@@ -1,4 +1,5 @@
 hadoop/hdfs/hadoop-2.7.6
+apache-atlas/apache-atlas-2.1.0/
 spark/spark-2.4.0-bin-hadoop2.7
 spark/applications/helloworld
 */venv/*
