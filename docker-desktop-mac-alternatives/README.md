@@ -25,7 +25,10 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", inline: $install
 end
 ```
-I could run `podman compose up` from the MacOS host, but podman only has access to the filesystem of the Linux guest. After some research I decided to go the route of just mounting the directory that houses all my projects in the guest (I read this is what docker desktop does anyway `¯\_(ツ)_/¯`). This also means you can't run `podman compose` on the host, but what I do is just keep a terminal open with `vagrant ssh`. I also use [Powerlevel10k](https://github.com/romkatv/powerlevel10k) in the guest and host so I know where my commands are running just by looking at the command prompt.
+I could run `podman compose up` from the MacOS host, but podman only has access to the filesystem of the Linux guest. After some research I decided to go the route of just mounting the directory that houses all my projects in the guest (I read this is what docker desktop does anyway `¯\_(ツ)_/¯`). This also means you can't run `podman compose` on the host, but what I do is just keep a terminal open with `vagrant ssh`. I also use [Powerlevel10k](https://github.com/romkatv/powerlevel10k) in the guest and host so I know where my commands are running just by looking at the command prompt. In any event, this means that I added a line to the Vagrantfile:
+```
+config.vm.synced_folder "/Users/jsicotte/Documents/workspaces", "/workspaces"
+```
 
 
 ## Option 1: Podman & Vagrant
