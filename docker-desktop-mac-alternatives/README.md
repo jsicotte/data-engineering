@@ -85,8 +85,8 @@ In order to make all this work with a browser on the host, I needed a way custom
 ```
 This now allows me to point my browser to: minio.mysite.test and see the Minio web console. However, when adding DNS it broke the Traefik user interface with cross domain errors. This was solved by adding the `traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:*` label to the Traefik's docker compose file.
 
-## Option 1: Podman & Vagrant
-- Podman has the ability to take an existing docker compose configuration and produce k8 YAML.
+#### More Podman Features (I have not tested yet)
+- The ability to take an existing docker compose configuration and produce k8 YAML.
 - You can also run k8 YAML without the need a cluster setup such as minikube.
-- [podman-macos](https://github.com/containers/podman-compose) provides a UI similar to Docker Desktop Mac.
+- [podman-macos](https://github.com/heyvito/podman-macos) provides a UI similar to Docker Desktop Mac. However this will not work with how I have it set up.
 
