@@ -83,6 +83,7 @@ In order to make all this work with a browser on the host, I needed a way custom
     config.vm.network :private_network, ip: "192.168.56.10"
     config.dns.patterns = [/^(\w+\.)*mysite\.test$/]
 ```
+This now allows me to point my browser to: minio.mysite.test and see the Minio web console.
 
 ## Option 1: Podman & Vagrant
 - Podman has the ability to take an existing docker compose configuration and produce k8 YAML.
