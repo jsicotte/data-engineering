@@ -51,7 +51,11 @@ services:
       # So that Traefik can listen to the Docker events
       - /run/podman/podman.sock:/var/run/docker.sock
 ```
-This works by starting the service and mounting the podman socket file (which emulates the docker socket file) in Traefik's container.
+This works by starting the service and mounting the podman socket file (which emulates the docker socket file) in Traefik's container. This also means that I need to open two ports on the guest so I added these two lines to the Vagrantfile:
+```
+    config.vm.network "forwarded_port", guest: 80, host: 80
+    config.vm.network "forwarded_port", guest: 8080, host: 8080
+```
 For a test, I fired up Minio with a compose file:
 ```
 version: "3.7"
@@ -68,7 +72,7 @@ services:
         labels:
             - traefik.http.routers.my-container.rule=Host(`minio.mysite.test`)
 ```
-Unfortunately Traefik does not automatically detect and expose the service, so at minimum I had to add a label: `traefik.http.routers.my-container.rule=Host(\`minio.mysite.test\`)`
+Unfortunately Traefik does not automatically detect and expose the service, so at minimum I had to add a label: `traefik.http.routers.my-container.rule`.
 
 ## Option 1: Podman & Vagrant
 - Podman has the ability to take an existing docker compose configuration and produce k8 YAML.
