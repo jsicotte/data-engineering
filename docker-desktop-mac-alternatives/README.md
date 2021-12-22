@@ -83,7 +83,7 @@ In order to make all this work with a browser on the host, I needed a way custom
     config.vm.network :private_network, ip: "192.168.56.10"
     config.dns.patterns = [/^(\w+\.)*mysite\.test$/]
 ```
-This now allows me to point my browser to: minio.mysite.test and see the Minio web console.
+This now allows me to point my browser to: minio.mysite.test and see the Minio web console. However, when adding DNS it broke the Traefik user interface with cross domain errors. This was solved by adding the `traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:*` label to the Traefik's docker compose file.
 
 ## Option 1: Podman & Vagrant
 - Podman has the ability to take an existing docker compose configuration and produce k8 YAML.
