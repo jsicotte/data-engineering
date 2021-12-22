@@ -11,6 +11,7 @@ The next step was to look for a docker-machine alternative. This led me to [lima
 ### Mostly Functional: Podman
 Moving on, I ran accross Podman. There used to be a `podman-machine` but it has since been deprecated and the docs essentially say "just use vagrant". [This article](https://marcusnoble.co.uk/2021-09-01-migrating-from-docker-to-podman/) on the topic of replacing Docker Mac with Podman is a great starting point.
 
+#### Guest vs Host Filesystems
 The first step was to create a VM with Vagrant and see if I can run a docker compose file. My initial Vagrantfile looked something like
 ```
 $install = <<-SCRIPT
@@ -30,6 +31,44 @@ I could run `podman compose up` from the MacOS host, but podman only has access 
 config.vm.synced_folder "/Users/jsicotte/Documents/workspaces", "/workspaces"
 ```
 
+#### Networking
+One of the things I really liked about Docker Mac was that if I opened a port I could just point my browser/tool to localhost:port and use the service. To get arond this issue I decided to use Traefik(https://traefik.io/) which is a docker aware reverse proxy. To make running Traefik fast ane easy, I created a docker compose file:
+```
+version: '3'
+
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.5
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /run/podman/podman.sock:/var/run/docker.sock
+```
+This works by starting the service and mounting the podman socket file (which emulates the docker socket file) in Traefik's container.
+For a test, I fired up Minio with a compose file:
+```
+version: "3.7"
+services:
+    minio:
+        hostname: minio
+        image: docker.io/minio/minio
+        ports:
+            - 9003:9003
+        environment:
+            - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+            - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        command: minio server /home/shared --console-address :9003
+        labels:
+            - traefik.http.routers.my-container.rule=Host(`minio.mysite.test`)
+```
+Unfortunately Traefik does not automatically detect and expose the service, so at minimum I had to add a label: `traefik.http.routers.my-container.rule=Host(\`minio.mysite.test\`)`
 
 ## Option 1: Podman & Vagrant
 - Podman has the ability to take an existing docker compose configuration and produce k8 YAML.
