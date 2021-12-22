@@ -2,6 +2,9 @@
 Since the licensing of Docker Desktop Mac has changed recently, there has been some interest in possible alternatives. Below is a possible list of alternatives.
 The replacements are biased for my use cases: docker compse for basic prototype work and Kubernetes for prodution work.
 
+## How To Use My Setup
+Install Vagrant and also the 
+
 ## Investigation History
 ### Failed Attempt: lima-vm and nerdcl
 At first I looked into using docker-machine since that is what I used prior to the Docker Desktop Mac, however maintenance stopped in 2019 and the project is now dead. Similarly, [boot2docker](https://github.com/boot2docker/boot2docker) is dead as well.
