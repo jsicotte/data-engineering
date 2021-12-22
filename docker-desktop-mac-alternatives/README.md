@@ -72,7 +72,17 @@ services:
         labels:
             - traefik.http.routers.my-container.rule=Host(`minio.mysite.test`)
 ```
-Unfortunately Traefik does not automatically detect and expose the service, so at minimum I had to add a label: `traefik.http.routers.my-container.rule`.
+Unfortunately Traefik does not automatically detect and expose the service, so at minimum I had to add a label: `traefik.http.routers.my-container.rule`. The service is now detected, but I could not access it unless I specified the host with curl `curl -Hhost=minio.mysite.test localhost:80`.
+
+#### More Networking: DNS
+In order to make all this work with a browser on the host, I needed a way customize DNS so that the host header would be implicitly set correctly. Luckily there is a [Vagrant DNS plugin](https://github.com/BerlinVagrant/vagrant-dns). After installing the plugin I added more configuration to the Vagrantfile so that the DNS would properly resolve:
+
+```
+    config.dns.tld = "test"
+    config.vm.hostname = "machine"
+    config.vm.network :private_network, ip: "192.168.56.10"
+    config.dns.patterns = [/^(\w+\.)*mysite\.test$/]
+```
 
 ## Option 1: Podman & Vagrant
 - Podman has the ability to take an existing docker compose configuration and produce k8 YAML.
