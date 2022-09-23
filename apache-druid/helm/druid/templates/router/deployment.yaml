@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: router
+  labels:
+    {{- include "druid.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: router
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: router
+        app.kubernetes.io/instance: release-name
+    spec:
+      containers:
+        - name: router
+          image: apache/druid:24.0.0
+          imagePullPolicy: IfNotPresent
+          args: [ "router" ]
+          ports:
+            - containerPort: 8888
+          envFrom:
+            - configMapRef:
+                name: druid-config

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: middlemanager
+spec:
+  selector:
+    app.kubernetes.io/name: middlemanager
+  ports:
+    - protocol: TCP
+      targetPort: 8091
+      port: 8091
+    # - protocol: TCP
+    #   targetPort: 8101
+    #   port: 8101
+    # - protocol: TCP
+    #   targetPort: 8102
+    #   port: 8103
+    # - protocol: TCP
+    #   targetPort: 8103
+    #   port: 8103
+    # - protocol: TCP
+    #   targetPort: 8104
+    #   port: 8104
+    # - protocol: TCP
+    #   targetPort: 8105
+    #   port: 8105
+    # - protocol: TCP
+    #   targetPort: 8091
+    #   port: 8091
