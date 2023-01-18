@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cube-deployment
+  labels:
+    app: cube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cube
+  template:
+    metadata:
+      labels:
+        app: cube
+        app.kubernetes.io/name: cube
+    spec:
+      containers:
+      - name: cube
+        image: cubejs/cube
+        ports:
+        - containerPort: 4000
+        env:
+        - name: CUBEJS_CUBESTORE_HOST
+          value: cube-store
+        - name: CUBEJS_API_SECRET
+          value: a085d56f3ebee22b42cd22bb62b8bf92f25992ae13888176cf9273f7b91c9d10e17ffcbf9692a2982071dd8d1f64b8a5fe2ceac656e99448faa8ff827e78cdf8
+        - name: CUBEJS_DB_TYPE
+          value: postgres
+        - name: CUBEJS_DB_HOST
+          value: postgres
+        - name: CUBEJS_DB_NAME
+          value: postgres
+        - name: CUBEJS_DB_USER
+          value: postgres
+        - name: CUBEJS_DB_PASS
+          value: postgres
+        - name: CUBEJS_REDIS_URL
+          value: redis://redis:6379
+        - name: CUBEJS_SQL_PORT
+          value: "3306"
+        - name: CUBEJS_SQL_USER
+          value: cube
+        - name: CUBEJS_SQL_PASSWORD
+          value: test
+        - name: DEBUG_LOG
+          value: "true"
+        - name: CUBEJS_LOG_LEVEL
+          value: "trace"
+        - name: CUBEJS_PG_SQL_PORT
+          value: "5432"
+        volumeMounts:
+        - mountPath: "/cube/conf"
+          name: mypd
+      volumes:
+        - name: mypd
+          persistentVolumeClaim:
+            claimName: cube-conf-claim-2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cube-store-deployment
+  labels:
+    app: cube-store
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cube-store
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cube-store
+    spec:
+      containers:
+      - name: cube-store
+        image: cubejs/cubestore
+        ports:
+        - containerPort: 3030
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: cube-conf-claim-2
+# spec:
+#   volumeName: cube-conf-2
+#   accessModes:
+#     - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 100Mi
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: cube-conf-2
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   capacity:
+#     storage: 100Mi
+#   hostPath:
+#     path: /data/cube/
+#   storageClassName: standard
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cube-store
+spec:
+  selector:
+    app.kubernetes.io/name: cube-store
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 3030
+      targetPort: 3030
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cube
+spec:
+  selector:
+    app.kubernetes.io/name: cube
+  type: NodePort
+  ports:
+    - protocol: TCP
+      name: rest
+      port: 4000
+      targetPort: 4000
+    - protocol: TCP
+      name: mysql
+      port: 3306
+      targetPort: 3306
+    - protocol: TCP
+      name: postgres
+      port: 5432
+      targetPort: 5432
