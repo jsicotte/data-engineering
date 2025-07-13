@@ -14,7 +14,7 @@ lazy val root = (project in file(".")).
 
     sparkVersion := "3.5.1",
 
-    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
+    javacOptions ++= Seq("-source", "17.0", "-target", "17.0"),
     javaOptions ++= Seq("-Xms512M", "-Xmx2048M",
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
@@ -38,6 +38,7 @@ lazy val root = (project in file(".")).
 
     libraryDependencies ++= Seq(
       "org.apache.spark" %% "spark-sql" % "3.5.1" % "provided",
+        "org.apache.hadoop" % "hadoop-aws" % "3.3.4"
     ),
 
     // uses compile classpath for the run task, including "provided" jar (cf http://stackoverflow.com/a/21803413/3827)
