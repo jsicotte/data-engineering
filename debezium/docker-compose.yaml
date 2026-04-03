@@ -1,0 +1,32 @@
+services:
+  mysql:
+    platform: linux/amd64
+    image: quay.io/debezium/example-mysql:latest
+    networks:
+      - custom_network
+    environment:
+      MYSQL_PASSWORD: mysqlpw
+      MYSQL_USER: mysqluser
+      MYSQL_ROOT_PASSWORD: debezium
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+  kafka_connect:
+    platform: linux/amd64
+    image: quay.io/debezium/connect:latest
+    networks:
+      - custom_network
+    ports:
+      - "8083:8083"
+    environment:
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+      BOOTSTRAP_SERVERS: "broker-1:19092,broker-2:19092,broker-3:19092"
+    depends_on:
+      - mysql
+
+networks:
+  custom_network:
+    external: true
