@@ -1,0 +1,1 @@
+Initially created with `sbt new holdenk/sparkProjectTemplate.g8` then modified.

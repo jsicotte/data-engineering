@@ -1,0 +1,28 @@
+# SBT build output
+target/
+project/target/
+project/project/
+
+# SBT boot/cache
+.sbt/
+
+# IDE
+.idea/
+.idea_modules/
+*.iml
+.bsp/
+.metals/
+.vscode/
+
+# Scala / Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Test artifacts
+test.parquet
+
+# OS
+.DS_Store
+Thumbs.db
