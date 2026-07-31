@@ -1,53 +1,202 @@
-version: "3.7"
-services:
+# Airflow 3.0.6 (CeleryExecutor) using the official apache/airflow image.
+#
+# WARNING: This configuration is for local development / PoC use only.
+#
+# Services:
+#   mysql               - metadata database
+#   redis               - celery broker + result backend
+#   airflow-init        - one-shot: runs db migrations, creates the admin user
+#   airflow-apiserver   - web UI + REST API, http://localhost:8080 (airflow/airflow)
+#   airflow-scheduler   - triggers task instances
+#   airflow-dag-processor - parses dag files (decoupled from the scheduler since Airflow 3)
+#   airflow-worker      - executes tasks
+#   airflow-triggerer   - event loop for deferrable tasks
+#   airflow-cli         - debug profile only: `docker compose run airflow-cli airflow <command>`
+---
+x-airflow-common:
+  &airflow-common
+  image: apache/airflow:3.0.6-python3.12
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: mysql+mysqldb://airflow:airflow@mysql/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+    AIRFLOW__CELERY__RESULT_BACKEND: redis://redis:6379/0
+    AIRFLOW__CORE__FERNET_KEY: I1BrhPSRskFL6xVst4JYD3pB2rlSrPtq6MWeTgePHz4=
+    AIRFLOW__API_AUTH__JWT_SECRET: ghT2ZjehQmloghss1UnCZX1k-1wOvpMCePidUGDJRF-Y0EXQtW8X5GyKtIRt13Ohf5X9R6iJrleIjxMs31lKcg
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+  user: "${AIRFLOW_UID:-50000}:0"
+  networks:
+    - airflow
+  depends_on:
+    &airflow-common-depends-on
     redis:
-        image: redis:5.0.5
-        networks: 
-            - airflow
-    webserver:
-        build: ./Broker/
-        ports:
-            - 8080:8080
-        environment:
-            - AIRFLOW_HOME=/root/airflow
-            - FERNET_KEY=I1BrhPSRskFL6xVst4JYD3pB2rlSrPtq6MWeTgePHz4=
-        command: airflow webserver
-        networks: 
-            - airflow
-        volumes:
-            - ./dags:/root/airflow/dags
-    celery-scheduler:
-        build: ./Broker/
-        environment:
-            - AIRFLOW_HOME=/root/airflow
-            - FERNET_KEY=I1BrhPSRskFL6xVst4JYD3pB2rlSrPtq6MWeTgePHz4=
-            - C_FORCE_ROOT=true
-        command: airflow scheduler
-        networks: 
-            - airflow
-        volumes:
-            - ./dags:/root/airflow/dags
-    start-worker:
-        build: ./Broker/
-        environment:
-            - AIRFLOW_HOME=/root/airflow
-            - FERNET_KEY=I1BrhPSRskFL6xVst4JYD3pB2rlSrPtq6MWeTgePHz4=
-            - C_FORCE_ROOT=true
-        command: airflow worker
-        networks: 
-            - airflow
-        volumes:
-            - ./dags:/root/airflow/dags
+      condition: service_healthy
     mysql:
-        image: mysql:8.0.19
-        environment:
-            - MYSQL_USER=airflow
-            - MYSQL_PASSWORD=airflow
-            - MYSQL_ROOT_PASSWORD=airflow
-            - MYSQL_DATABASE=airflow
-        networks: 
-            - airflow
-        ports:
-            - 3306:3306
-networks: 
-    airflow:
+      condition: service_healthy
+
+services:
+  mysql:
+    image: mysql:8.4
+    command: --explicit-defaults-for-timestamp=1
+    environment:
+      MYSQL_USER: airflow
+      MYSQL_PASSWORD: airflow
+      MYSQL_ROOT_PASSWORD: airflow
+      MYSQL_DATABASE: airflow
+    volumes:
+      - mysql-db-volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pairflow"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    networks:
+      - airflow
+
+  redis:
+    # Redis is limited to 7.2-bookworm due to the licencing change:
+    # https://redis.io/blog/redis-adopts-dual-source-available-licensing/
+    image: redis:7.2-bookworm
+    expose:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 50
+      start_period: 30s
+    restart: always
+    networks:
+      - airflow
+
+  airflow-apiserver:
+    <<: *airflow-common
+    command: api-server
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-worker:
+    <<: *airflow-common
+    command: celery worker
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    environment:
+      <<: *airflow-common-env
+      # Required to handle warm shutdown of the celery workers properly
+      # https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
+      DUMB_INIT_SETSID: "0"
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-apiserver:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-triggerer:
+    <<: *airflow-common
+    command: triggerer
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -v -p /opt/airflow/{logs,dags,plugins}
+        chown -R "${AIRFLOW_UID:-50000}:0" /opt/airflow/{logs,dags,plugins}
+        exec /entrypoint airflow version
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: airflow
+      _AIRFLOW_WWW_USER_PASSWORD: airflow
+    user: "0:0"
+
+  airflow-cli:
+    <<: *airflow-common
+    profiles:
+      - debug
+    environment:
+      <<: *airflow-common-env
+      CONNECTION_CHECK_MAX_COUNT: "0"
+    # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
+    command:
+      - bash
+      - -c
+      - airflow
+
+networks:
+  airflow:
+
+volumes:
+  mysql-db-volume:
