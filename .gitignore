@@ -9,3 +9,5 @@ spark/applications/helloworld
 .idea
 *.tar.gz
 *.tgz
+__pycache__/
+*.py[cod]
