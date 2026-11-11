@@ -1,0 +1,49 @@
+plugins {
+    id 'scala'
+    id 'application'
+}
+
+group = 'com.example'
+version = '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    scalaBinaryVersion = '2.13'
+    scalaVersion = '2.13.16'
+    sparkVersion = '3.5.1'
+    icebergVersion = '1.10.1'
+}
+
+dependencies {
+    implementation "org.scala-lang:scala-library:${scalaVersion}"
+    implementation "org.apache.spark:spark-sql_${scalaBinaryVersion}:${sparkVersion}"
+    implementation "org.apache.iceberg:iceberg-spark-runtime-3.5_${scalaBinaryVersion}:${icebergVersion}"
+    implementation "org.apache.iceberg:iceberg-aws-bundle:${icebergVersion}"
+}
+
+application {
+    mainClass = 'com.example.sparkexample.IcebergHelloWorld'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(ScalaCompile).configureEach {
+    scalaCompileOptions.additionalParameters = ['-deprecation', '-unchecked']
+}
+
+// Spark needs these opens on Java 17+ to access internal JDK APIs via reflection.
+def jdkOpens = [
+    'java.lang', 'java.lang.invoke', 'java.lang.reflect', 'java.io', 'java.net',
+    'java.nio', 'java.util', 'java.util.concurrent', 'java.util.concurrent.atomic',
+    'sun.nio.ch', 'sun.nio.cs', 'sun.security.action', 'sun.util.calendar'
+].collect { pkg -> "--add-opens=java.base/${pkg}=ALL-UNNAMED".toString() }
+
+tasks.named('run', JavaExec) {
+    jvmArgs = jdkOpens
+}
