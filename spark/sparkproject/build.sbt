@@ -31,7 +31,7 @@ lazy val root = (project in file(".")).
         "--add-opens=java.base/sun.util.calendar=ALL-UNNAMED",
     ),
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
-    parallelExecution in Test := false,
+    Test / parallelExecution := false,
     fork := true,
 
     coverageHighlighting := true,
@@ -42,7 +42,7 @@ lazy val root = (project in file(".")).
     ),
 
     // uses compile classpath for the run task, including "provided" jar (cf http://stackoverflow.com/a/21803413/3827)
-    run in Compile := Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run)).evaluated,
+    Compile / run := Defaults.runTask(Compile / fullClasspath, Compile / run / mainClass, Compile / run / runner).evaluated,
 
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
     pomIncludeRepository := { x => false },

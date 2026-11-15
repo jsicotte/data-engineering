@@ -1,0 +1,18 @@
+[project]
+name = "python-example"
+version = "0.1.0"
+description = "PyIceberg hello-world: writes/reads an Iceberg table via the Polaris REST catalog"
+authors = [
+    { name = "Jason Sicotte", email = "sicotte.jason@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "pyiceberg[pyarrow]>=0.11",
+]
+
+[project.scripts]
+python-example = "python_example:main"
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"

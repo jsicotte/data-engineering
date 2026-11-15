@@ -1,7 +1,7 @@
 services:
   mysql:
     platform: linux/amd64
-    image: quay.io/debezium/example-mysql:latest
+    image: quay.io/debezium/example-mysql:3.6.0.Final
     networks:
       - custom_network
     environment:
@@ -13,7 +13,7 @@ services:
       - "3306:3306"
   kafka_connect:
     platform: linux/amd64
-    image: quay.io/debezium/connect:latest
+    image: quay.io/debezium/connect:3.6.0.Final
     networks:
       - custom_network
     ports:

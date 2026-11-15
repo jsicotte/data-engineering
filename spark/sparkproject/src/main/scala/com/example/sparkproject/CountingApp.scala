@@ -11,7 +11,7 @@ import org.apache.spark.{SparkConf, SparkContext}
  */
 object CountingLocalApp extends App {
     val spark = SparkSession.builder()
-      .master("local[1]")
+
       .getOrCreate()
 
     val someData = Seq(Row(8, "bat"))
