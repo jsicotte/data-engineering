@@ -11,3 +11,9 @@ spark/applications/helloworld
 *.tgz
 __pycache__/
 *.py[cod]
+
+# Airflow runtime logs
+airflow/logs/
+
+# Spark job output
+spark/sparkproject/test.parquet/
