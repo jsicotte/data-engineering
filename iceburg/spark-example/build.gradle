@@ -12,15 +12,15 @@ repositories {
 
 ext {
     scalaBinaryVersion = '2.13'
-    scalaVersion = '2.13.16'
-    sparkVersion = '3.5.1'
-    icebergVersion = '1.10.1'
+    scalaVersion = '2.13.18'
+    sparkVersion = '4.1.4'
+    icebergVersion = '1.12.0'
 }
 
 dependencies {
     implementation "org.scala-lang:scala-library:${scalaVersion}"
     implementation "org.apache.spark:spark-sql_${scalaBinaryVersion}:${sparkVersion}"
-    implementation "org.apache.iceberg:iceberg-spark-runtime-3.5_${scalaBinaryVersion}:${icebergVersion}"
+    implementation "org.apache.iceberg:iceberg-spark-runtime-4.1_${scalaBinaryVersion}:${icebergVersion}"
     implementation "org.apache.iceberg:iceberg-aws-bundle:${icebergVersion}"
 }
 

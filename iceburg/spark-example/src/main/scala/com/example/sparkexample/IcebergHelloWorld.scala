@@ -27,6 +27,7 @@ object IcebergHelloWorld {
       .config("spark.sql.catalog.polaris.type", "rest")
       .config("spark.sql.catalog.polaris.uri", polarisUri)
       .config("spark.sql.catalog.polaris.warehouse", catalogName)
+      .config("spark.sql.catalog.polaris.rest.auth.type", "oauth2")
       .config("spark.sql.catalog.polaris.credential", s"$clientId:$clientSecret")
       .config("spark.sql.catalog.polaris.scope", "PRINCIPAL_ROLE:ALL")
       .config("spark.sql.catalog.polaris.io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
